@@ -1,0 +1,1021 @@
+<title>组件：角色资料卡</title>
+<style>
+*, *::before, *::after {
+  -webkit-tap-highlight-color: transparent !important;
+  outline: none !important;
+  box-sizing: border-box;
+}
+.Gz-flow-realm {
+  width: 100%;
+  margin: 4px auto;
+  font-family: 'Noto Serif SC', serif;
+  background: transparent;
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.Gz-main-stage {
+  position: relative;
+  width: 100%;
+  min-height: 410px;
+}
+
+/* 主画幅 */
+.Gz-hero-anchor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 390px;
+  z-index: 2;
+  cursor: pointer;
+  transition: all .9s cubic-bezier(.22, 1, .36, 1);
+  transform-origin: center top;
+}
+.Gz-hero-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 20%;
+  display: block;
+  opacity: 0;
+  filter: blur(8px) brightness(.5);
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 16%, #000 84%, transparent 100%), linear-gradient(to bottom, transparent 0, #000 12%, #000 88%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(to right, transparent 0, #000 16%, #000 84%, transparent 100%), linear-gradient(to bottom, transparent 0, #000 12%, #000 88%, transparent 100%);
+  mask-composite: intersect;
+  transition: filter .9s ease, opacity .9s ease;
+}
+
+/* 幽冥赤芒阵 */
+.Gz-back-crimson-aura {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 280px;
+  height: 280px;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, rgba(180, 25, 25, 0.6) 0%, rgba(90, 8, 12, 0.3) 55%, transparent 75%);
+  filter: blur(24px);
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .8s ease;
+}
+.Gz-flow-realm[data-phase="1"] .Gz-back-crimson-aura {
+  opacity: 1;
+}
+
+/* 第三幕：立轴居中头像框 */
+.Gz-flow-realm[data-phase="3"] .Gz-hero-anchor {
+  top: 0;
+  left: calc(50% - 56px);
+  width: 112px;
+  height: 156px;
+  z-index: 10;
+  cursor: pointer;
+}
+.Gz-flow-realm[data-phase="3"] .Gz-hero-img {
+  border: 1px solid rgba(186, 38, 38, .8);
+  box-shadow: 0 0 14px rgba(0, 0, 0, .95), 0 0 10px rgba(186, 38, 38, .3);
+  -webkit-mask-image: none;
+  mask-image: none;
+  opacity: 1;
+  filter: blur(0) brightness(1);
+}
+
+/* 点开卷宗弹层时，角色图片完全隐去，释放视区 */
+.Gz-flow-realm.is-reading-pop .Gz-hero-anchor {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transition: opacity .4s ease;
+}
+
+/* 第一幕：金钱与佛手 */
+.Gz-curtain-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 390px;
+  overflow: hidden;
+  z-index: 4;
+  pointer-events: none;
+}
+.Gz-coins {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 120px;
+  height: 260px;
+  transform: translate(-50%, -50%) scale(.7);
+  background: url('https://cdn.mufy.ai/images/bb2c2424-c207-444b-45f1-d7638ac44a00/public') no-repeat center;
+  background-size: contain;
+  z-index: 5;
+  opacity: 0;
+  filter: drop-shadow(0 0 16px rgba(212, 175, 55, .9));
+}
+.Gz-hand {
+  position: absolute;
+  width: 68%;
+  height: 90%;
+  top: 50%;
+  background-size: contain;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  opacity: 0;
+}
+.Gz-hand-l {
+  left: -6%;
+  background-image: url('https://cdn.mufy.ai/images/ac219209-0abe-4606-c8cf-dd05a125c700/public');
+  background-position: right center;
+  filter: drop-shadow(0 0 2px #ff2222) drop-shadow(0 0 14px rgba(220, 20, 60, .9)) drop-shadow(4px 4px 18px rgba(0,0,0,1));
+  transform: translateY(calc(-50% - 36px)) translateX(-110%);
+  z-index: 6;
+}
+.Gz-hand-r {
+  right: -6%;
+  background-image: url('https://cdn.mufy.ai/images/57f69ad3-46b7-4160-bf10-25aae887cd00/public');
+  background-position: left center;
+  filter: drop-shadow(0 0 2px #ff2222) drop-shadow(0 0 14px rgba(220, 20, 60, .9)) drop-shadow(-4px 4px 18px rgba(0,0,0,1));
+  transform: translateY(calc(-50% + 36px)) translateX(110%);
+  z-index: 4;
+}
+.Gz-s1-hint {
+  position: absolute;
+  bottom: 14px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: #E6C280;
+  text-shadow: 0 0 6px #000, 0 0 12px #900;
+  z-index: 7;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* 第二幕：避脸排版 */
+.Gz-s2-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 390px;
+  z-index: 5;
+  padding: 18px 16px 14px 16px;
+  pointer-events: none;
+  display: flex;
+  justify-content: space-between;
+}
+.Gz-s2-block-left {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: auto;
+  height: 100%;
+  position: relative;
+  z-index: 2;
+}
+.Gz-s2-seal-box {
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 4px;
+  color: #FFFFFF;
+  background: #8B0000;
+  border: 1px solid rgba(255, 255, 255, .4);
+  padding: 8px 3px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, .9);
+  opacity: 0;
+}
+.Gz-s2-name-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-top: 14px;
+  line-height: 0.88;
+  gap: 0;
+  position: relative;
+  padding-left: 12px;
+}
+.Gz-s2-name-col::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 10px;
+  bottom: 10px;
+  width: 1px;
+  background: linear-gradient(180deg, transparent, #8B0000 25%, #8B0000 75%, transparent);
+}
+.Gz-v-name-char {
+  display: inline-block;
+  font-weight: 900;
+  color: #FFFFFF;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, .95), 0 0 14px rgba(139, 0, 0, .8);
+  opacity: 0;
+}
+.Gz-v-name-gu { font-size: clamp(38px, 9.5vw, 46px); }
+.Gz-v-name-wang { font-size: clamp(38px, 9.5vw, 46px); margin-left: 22px; }
+.Gz-s2-left-sub {
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+  margin-top: 10px;
+  font-size: 9px;
+  letter-spacing: 3px;
+  color: #C92A2A;
+  border-left: 1px solid #8B0000;
+  padding-left: 4px;
+  opacity: 0;
+}
+.Gz-s2-block-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: flex-end;
+  height: 100%;
+  padding-bottom: 12px;
+  position: relative;
+  z-index: 2;
+}
+.Gz-s2-creed-group {
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+  display: flex;
+  flex-direction: row-reverse;
+  gap: 8px;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+.Gz-s2-pillar-red {
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 3px;
+  color: #C92A2A;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, .95);
+  opacity: 0;
+}
+.Gz-s2-pillar-white {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  color: #FFFFFF;
+  text-shadow: 0 1px 5px rgba(0, 0, 0, .95);
+  opacity: 0;
+  padding-top: 14px;
+}
+.Gz-s2-tags-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  opacity: 0;
+}
+.Gz-s2-tag-item {
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: #FFFFFF;
+  background: rgba(18, 2, 4, .75);
+  border: 1px solid #8B0000;
+  padding: 2px 6px;
+  text-shadow: 0 0 4px #000;
+}
+.Gz-s2-tag-item span {
+  color: #C92A2A;
+  margin-right: 2px;
+  font-weight: bold;
+}
+.Gz-s2-prompt-bar {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  opacity: 0;
+  z-index: 3;
+}
+.Gz-s2-prompt-line { width: 36px; height: 1px; background: #8B0000; }
+.Gz-s2-prompt-txt { font-size: 9px; letter-spacing: 3px; color: #FFFFFF; text-shadow: 0 0 6px #000; }
+
+/* 第三幕：环绕展台与详实名牒 */
+.Gz-s3-frame {
+  width: 100%;
+  display: none;
+  position: relative;
+  z-index: 3;
+}
+.Gz-s3-top-ring {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+  width: 100%;
+  height: 156px;
+  position: relative;
+}
+.Gz-s3-wing-l, .Gz-s3-wing-r {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 4px;
+}
+.Gz-s3-slot-placeholder {
+  width: 112px;
+  flex-shrink: 0;
+  height: 156px;
+}
+
+/* 固高六角卡片，布局稳定 */
+.Gz-step3-tile {
+  background: rgba(18, 2, 4, .85);
+  border: 1px solid rgba(186, 38, 38, .35);
+  padding: 4px 6px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1px;
+  height: 48px;
+  opacity: 0;
+  cursor: pointer;
+  transition: border-color .2s ease, background .2s ease;
+  position: relative;
+}
+.Gz-step3-tile:hover {
+  background: rgba(45, 6, 10, .9);
+  border-color: rgba(220, 40, 40, .8);
+}
+.Gz-step3-tile-r { border-right: 2px solid #8B0000; }
+.Gz-step3-tile-l { border-left: 2px solid #8B0000; }
+.Gz-step3-k {
+  font-size: 8.5px;
+  color: #A39691;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.Gz-step3-k::after {
+  content: '✦';
+  font-size: 7px;
+  color: #8B0000;
+}
+.Gz-step3-v {
+  font-size: 10px;
+  font-weight: 700;
+  color: #FFFFFF;
+  letter-spacing: .5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 全宽覆盖式弹层，覆盖整个展台，层级置顶，无障碍阅读 */
+.Gz-pop-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(10, 1, 2, .98);
+  border: 1px solid #8B0000;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, .98);
+  z-index: 50;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(6px);
+  transition: opacity .3s ease, transform .3s ease;
+}
+.Gz-pop-overlay.is-active {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+.Gz-pop-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px dashed rgba(186, 38, 38, .4);
+  padding-bottom: 4px;
+}
+.Gz-pop-title {
+  font-size: 11px;
+  font-weight: 900;
+  color: #FFFFFF;
+  letter-spacing: 1px;
+}
+.Gz-pop-close {
+  font-size: 11px;
+  color: #C92A2A;
+  cursor: pointer;
+  padding: 0 6px;
+}
+.Gz-pop-content {
+  font-size: 10.5px;
+  line-height: 1.65;
+  color: #ECE0DE;
+  text-align: justify;
+  margin: 6px 0;
+  overflow-y: auto;
+}
+.Gz-pop-foot {
+  font-size: 8.5px;
+  color: #7D6F6B;
+  text-align: right;
+  letter-spacing: 1px;
+}
+
+/* 纵向卷宗卡组 */
+.Gz-s3-body {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.Gz-step3-panel {
+  background: rgba(14, 2, 4, .78);
+  border: 1px solid rgba(186, 38, 38, .3);
+  padding: 8px 10px;
+  opacity: 0;
+  position: relative;
+}
+.Gz-step3-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 2px;
+  height: 100%;
+  background: #8B0000;
+}
+.Gz-step3-head {
+  font-size: 11px;
+  font-weight: 900;
+  color: #FFFFFF;
+  letter-spacing: 1.5px;
+  border-bottom: 1px dashed rgba(186, 38, 38, .35);
+  padding-bottom: 4px;
+  margin-bottom: 5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.Gz-step3-head-sub {
+  color: #C92A2A;
+  font-size: 9px;
+  font-weight: normal;
+}
+.Gz-step3-txt {
+  font-size: 10.5px;
+  line-height: 1.6;
+  color: #D6C7C4;
+  margin: 0;
+  text-align: justify;
+}
+.Gz-step3-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-top: 4px;
+}
+.Gz-step3-field {
+  background: rgba(0, 0, 0, .4);
+  padding: 4px 6px;
+  border: 1px solid rgba(139, 0, 0, .2);
+}
+.Gz-step3-field-k {
+  font-size: 9px;
+  color: #C92A2A;
+  margin-bottom: 2px;
+}
+.Gz-step3-field-v {
+  font-size: 10px;
+  color: #ECE0DE;
+  line-height: 1.45;
+}
+
+/* 镇灵法器 */
+.Gz-step3-talisman {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  background: rgba(14, 2, 4, .78);
+  border: 1px solid rgba(186, 38, 38, .3);
+  padding: 6px 8px;
+  opacity: 0;
+}
+.Gz-step3-talisman::before {
+  content: '';
+  position: absolute;
+  right: -24px;
+  top: -24px;
+  width: 120px;
+  height: 120px;
+  background: url('https://cdn.mufy.ai/images/bb2c2424-c207-444b-45f1-d7638ac44a00/public') no-repeat center;
+  background-size: contain;
+  opacity: .2;
+  pointer-events: none;
+  transform: rotate(-15deg);
+  z-index: 0;
+}
+.Gz-step3-talisman > * { position: relative; z-index: 1; }
+.Gz-step3-talisman-pic {
+  width: 44px;
+  height: 64px;
+  background: url('https://cdn.mufy.ai/images/c26490a4-e3c1-4e6c-bc0e-06bb6cca6300/public') no-repeat center;
+  background-size: cover;
+  border: 1px solid rgba(186, 38, 38, .5);
+  flex-shrink: 0;
+}
+.Gz-step3-talisman-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.Gz-step3-talisman-h {
+  font-size: 11px;
+  font-weight: 800;
+  color: #FFFFFF;
+}
+.Gz-step3-talisman-p {
+  font-size: 9.5px;
+  color: #A39691;
+  line-height: 1.45;
+  margin: 0;
+}
+.Gz-step3-foot {
+  border-top: 1px solid rgba(186, 38, 38, .3);
+  padding-top: 4px;
+  margin-top: 2px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+  color: #7D6F6B;
+  letter-spacing: 1px;
+  opacity: 0;
+}
+</style>
+
+<div class="Gz-flow-realm" id="gzRoot" data-phase="1">
+  <div class="Gz-main-stage" id="gzStage">
+    <!-- 赤芒聚光阵 -->
+    <div class="Gz-back-crimson-aura"></div>
+
+    <!-- 变位角色原画 -->
+    <div class="Gz-hero-anchor" id="gzHeroAnchor">
+      <img class="Gz-hero-img" id="gzHeroImg" src="https://cdn.mufy.ai/images/08b3f2d7-de77-4c91-05e5-a5e3361d8d00/public" alt="真容">
+    </div>
+
+    <!-- 佛手遮障幕 -->
+    <div class="Gz-curtain-layer" id="gzCurtain">
+      <div class="Gz-hand Gz-hand-r" id="gzHandR"></div>
+      <div class="Gz-coins" id="gzCoins"></div>
+      <div class="Gz-hand Gz-hand-l" id="gzHandL"></div>
+      <div class="Gz-s1-hint" id="gzHint">【叩击佛印 · 破除幽障】</div>
+    </div>
+
+    <!-- 第二幕：避脸排版 -->
+    <div class="Gz-s2-layer" id="gzS2Layer">
+      <div class="Gz-s2-block-left">
+        <div class="Gz-s2-seal-box" id="gzSealBox">昭幽司命</div>
+        <div class="Gz-s2-name-col">
+          <span class="Gz-v-name-char Gz-v-name-gu" id="gzNameGu">顾</span>
+          <span class="Gz-v-name-char Gz-v-name-wang" id="gzNameWang">妄</span>
+        </div>
+        <div class="Gz-s2-left-sub" id="gzLeftSub">九幽引魂使·兼判官印</div>
+      </div>
+
+      <div class="Gz-s2-block-right">
+        <div class="Gz-s2-creed-group">
+          <div class="Gz-s2-pillar-red" id="gzCreedRed">生死同囚·逆命难回</div>
+          <div class="Gz-s2-pillar-white" id="gzCreedWhite">骨透寒玉·血引残毒</div>
+        </div>
+        <div class="Gz-s2-tags-row" id="gzTagsRow">
+          <div class="Gz-s2-tag-item"><span>煞</span>克生劫</div>
+          <div class="Gz-s2-tag-item"><span>器</span>黄表卷</div>
+          <div class="Gz-s2-tag-item"><span>执</span>捌拾捌</div>
+        </div>
+      </div>
+
+      <div class="Gz-s2-prompt-bar" id="gzPromptBar">
+        <div class="Gz-s2-prompt-line"></div>
+        <span class="Gz-s2-prompt-txt">叩击纳阅名牒全宗</span>
+        <div class="Gz-s2-prompt-line"></div>
+      </div>
+    </div>
+
+    <!-- 第三幕：全宗展开层 -->
+    <div class="Gz-s3-frame" id="gzS3Frame">
+      <div class="Gz-s3-top-ring">
+        <div class="Gz-s3-wing-l" id="gzWingL">
+          <div class="Gz-step3-tile Gz-step3-tile-r" data-title="身份与世系" data-desc="前朝钦天监世家遗孤，宗门倾覆后孤身涉入奈何桥，以生魂换得幽冥判笔，于九幽执掌卷宗七百年，名籍不入生死轮回。">
+          <span class="Gz-step3-k">身份与世系</span>
+          <span class="Gz-step3-v">北陆罪嗣 · 司命正卿</span>
+          </div>
+          <div class="Gz-step3-tile Gz-step3-tile-r" data-title="骨相与仪态" data-desc="身形清瘦修长，指节覆有尸寒之气，腕系镇魂重链。面色如雪，眉眼狭长凌厉，抬眸间常带霜刃之威。">
+          <span class="Gz-step3-k">骨相与仪态</span>
+          <span class="Gz-step3-v">冷玉雕骨 · 苍白病质</span>
+          </div>
+          <div class="Gz-step3-tile Gz-step3-tile-r" data-title="癖好与幽微" data-desc="厌恶俗世甜腻与生机，惯于子夜独自擦拭青铜案台与残损符箓，偶以竹管收贮古砚内的化墨晨露。">
+          <span class="Gz-step3-k">癖好与幽微</span>
+          <span class="Gz-step3-v">研磨寒砂 · 焚苦檀香</span>
+          </div>
+        </div>
+
+        <div class="Gz-s3-slot-placeholder"></div>
+
+        <div class="Gz-s3-wing-r" id="gzWingR">
+          <div class="Gz-step3-tile Gz-step3-tile-l" data-title="心性与行止" data-desc="寡言少语，处事严苛寡情。视诺言如命契，若立誓虽黄泉不改；然若遭背弃，必亲自提笔抹去其轮回退路。">
+          <span class="Gz-step3-k">心性与行止</span>
+          <span class="Gz-step3-v">孤冷偏执 · 护短断绝</span>
+          </div>
+          <div class="Gz-step3-tile Gz-step3-tile-l" data-title="暗伤与禁锢" data-desc="躯壳封锁万千厉鬼煞气，每逢望日阴气逆流，骨肉如遭焰火燔灼，须以朱砂锁链将身躯缚于冰棺暂避。">
+          <span class="Gz-step3-k">暗伤与禁锢</span>
+          <span class="Gz-step3-v">血引反噬 · 子夜心燔</span>
+          </div>
+          <div class="Gz-step3-tile Gz-step3-tile-l" data-title="因果与网络" data-desc="虽与各方殿主平列，却从不往来。座下唯有一只引魂玄鸦随行，历来只认契合生辰红线的特定宿主。">
+          <span class="Gz-step3-k">因果与网络</span>
+          <span class="Gz-step3-v">十殿侧目 · 独行幽途</span>
+          </div>
+        </div>
+
+        <!-- 悬浮弹窗：层级更高，点开时隐藏头像，阻隔彻底消除 -->
+        <div class="Gz-pop-overlay" id="gzPopOverlay">
+          <div class="Gz-pop-header">
+          <span class="Gz-pop-title" id="gzPopTitle">卷宗档案</span>
+          <span class="Gz-pop-close" id="gzPopClose">✕ 阖上</span>
+          </div>
+          <div class="Gz-pop-content" id="gzPopContent"></div>
+          <div class="Gz-pop-foot">昭幽案卷 · 秘不外传</div>
+        </div>
+      </div>
+
+      <!-- 生平详细面板 -->
+      <div class="Gz-s3-body" id="gzBody">
+        <div class="Gz-step3-panel">
+          <div class="Gz-step3-head">
+          <span>❖ 司命本纪 · 浮生履历</span>
+          <span class="Gz-step3-head-sub">卷宗密封</span>
+          </div>
+          <p class="Gz-step3-txt">幼时逢九族诛戮之劫，凭半截残符游荡于阴阳界限，后坐镇幽都偏殿，掌管无主生魂籍册。任职至今凡七百载，手中断魂朱笔未尝写错一人因果，性喜冷寂，最厌喧嚣生人靠近，独对案前合契八字百般查验。</p>
+          <div class="Gz-step3-grid-2">
+          <div class="Gz-step3-field">
+          <div class="Gz-step3-field-k">外人评语</div>
+          <div class="Gz-step3-field-v">群鬼皆呼为断念煞神，闻其墨香即伏地战栗，不敢直视。</div>
+          </div>
+          <div class="Gz-step3-field">
+          <div class="Gz-step3-field-k">不为人知</div>
+          <div class="Gz-step3-field-v">随身暗袋内藏有一片未燃尽的凡间衣角，带微温，触之平心。</div>
+          </div>
+          </div>
+        </div>
+
+        <div class="Gz-step3-panel">
+          <div class="Gz-step3-head">
+          <span>❖ 宿契律令 · 生死通牒</span>
+          <span class="Gz-step3-head-sub">不可违逆</span>
+          </div>
+          <p class="Gz-step3-txt">入殿画押者，名录由司命亲手自册上抹去，阴阳不扰，诸祟退避。此誓立成，生生世世受幽都庇护；倘若中途反悔遁走，腕间血誓立化索魂钩，形神俱散。</p>
+        </div>
+
+        <div class="Gz-step3-talisman">
+          <div class="Gz-step3-talisman-pic"></div>
+          <div class="Gz-step3-talisman-main">
+          <span class="Gz-step3-talisman-h">极阴敕令 · 镇灵压胜符</span>
+          <p class="Gz-step3-talisman-p">采九幽寒玉研粉淬炼，朱砂行笔成符。佩之可御极阴煞气侵袭，且内藏神识微缕，虽隔两界亦能瞬息感应行踪。</p>
+          </div>
+        </div>
+
+        <div class="Gz-step3-foot">
+          <span>司职：昭幽冥正使</span>
+          <span>因果：命契既落 · 永锢幽台</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  const root = document.getElementById('gzRoot');
+  if (!root) return;
+  const q = s => root.querySelector(s);
+
+  const heroAnchor = q('#gzHeroAnchor');
+  const heroImg    = q('#gzHeroImg');
+  const curtain    = q('#gzCurtain');
+  const coins      = q('#gzCoins');
+  const handL      = q('#gzHandL');
+  const handR      = q('#gzHandR');
+  const hint       = q('#gzHint');
+
+  const s2Layer    = q('#gzS2Layer');
+  const sealBox    = q('#gzSealBox');
+  const nameGu     = q('#gzNameGu');
+  const nameWang   = q('#gzNameWang');
+  const leftSub    = q('#gzLeftSub');
+  const creedRed   = q('#gzCreedRed');
+  const creedWhite = q('#gzCreedWhite');
+  const tagsRow    = q('#gzTagsRow');
+  const promptBar  = q('#gzPromptBar');
+
+  const s3Frame    = q('#gzS3Frame');
+  const wingL      = Array.from(q('#gzWingL').children);
+  const wingR      = Array.from(q('#gzWingR').children);
+  const bodyItems  = Array.from(q('#gzBody').children);
+
+  const popOverlay = q('#gzPopOverlay');
+  const popTitle   = q('#gzPopTitle');
+  const popContent = q('#gzPopContent');
+  const popClose   = q('#gzPopClose');
+
+  const s2Els = [sealBox, nameGu, nameWang, leftSub, creedRed, creedWhite, tagsRow, promptBar];
+  const s3Els = [...wingL, ...wingR, ...bodyItems];
+
+  /* ===== 点击音效 ===== */
+  const SFX_SRC  = 'https://raw.githubusercontent.com/chasochips-beep/audio-kucun/main/一串钥匙的声响.mp3';
+  const SFX_SKIP = 0.6;
+  const SFX_VOL  = 0.75;
+
+  let sfxCtx = null;
+  let sfxBuffer = null;
+  const sfxFallback = new Audio(SFX_SRC);
+  sfxFallback.preload = 'auto';
+  sfxFallback.volume = SFX_VOL;
+
+  (function preloadSfx(){
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    sfxCtx = new AC();
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', SFX_SRC, true);
+    xhr.responseType = 'arraybuffer';
+    xhr.onload = function(){
+      if (xhr.status >= 200 && xhr.status < 300 && xhr.response) {
+        sfxCtx.decodeAudioData(
+          xhr.response,
+          function(dec){
+            sfxBuffer = dec;
+            console.log('[音效] 就绪', dec.duration.toFixed(2) + 's');
+          },
+          function(err){ console.warn('[音效] 解码失败', err); }
+        );
+      } else {
+        console.warn('[音效] XHR 状态异常', xhr.status);
+      }
+    };
+    xhr.onerror = function(){ console.warn('[音效] 网络失败'); };
+    xhr.send();
+  })();
+
+  function playSfx(){
+    if (sfxCtx && sfxBuffer) {
+      if (sfxCtx.state === 'suspended') sfxCtx.resume();
+      const src = sfxCtx.createBufferSource();
+      src.buffer = sfxBuffer;
+      const g = sfxCtx.createGain();
+      g.gain.value = SFX_VOL;
+      src.connect(g);
+      g.connect(sfxCtx.destination);
+      src.start(0, SFX_SKIP);
+    } else {
+      try {
+        sfxFallback.currentTime = SFX_SKIP;
+        sfxFallback.play().catch(function(){});
+      } catch (e) {}
+    }
+  }
+  /* ===== 音效结束 ===== */
+
+  const EASE_FLOW = 'cubic-bezier(.16, 1, .3, 1)';
+  const KF = {
+    fromLeft:  [{ opacity:0, transform:'translateX(-36px)' }, { opacity:1, transform:'translateX(0)' }],
+    fromRight: [{ opacity:0, transform:'translateX(36px)' },  { opacity:1, transform:'translateX(0)' }],
+    fromBottom:[{ opacity:0, transform:'translateY(24px)' },  { opacity:1, transform:'translateY(0)' }],
+    down:      [{ opacity:0, transform:'translateY(-14px)' }, { opacity:1, transform:'translateY(0)' }],
+    up:        [{ opacity:0, transform:'translateY(14px)' },  { opacity:1, transform:'translateY(0)' }],
+    fade:      [{ opacity:0 }, { opacity:1 }]
+  };
+
+  const wait = ms => new Promise(r => setTimeout(r, ms));
+  function anim(el, frames, opts) {
+    if (!el) return null;
+    el.getAnimations().forEach(a => a.cancel());
+    return el.animate(frames, Object.assign({ duration: 900, easing: EASE_FLOW, fill: 'both' }, opts));
+  }
+  function cancelAll(list) { list.forEach(el => el && el.getAnimations().forEach(a => a.cancel())); }
+
+  let current = 0, busy = false, token = 0;
+
+  /* 弹层交互：打开时给根元素加 class，完全隐藏中心图片；关闭时移除 */
+  [...wingL, ...wingR].forEach(tile => {
+    tile.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const t = tile.getAttribute('data-title');
+      const d = tile.getAttribute('data-desc');
+      popTitle.textContent = '❖ ' + t;
+      popContent.textContent = d;
+      root.classList.add('is-reading-pop');
+      popOverlay.classList.add('is-active');
+    });
+  });
+
+  function closePopup() {
+    popOverlay.classList.remove('is-active');
+    root.classList.remove('is-reading-pop');
+  }
+
+  popClose.addEventListener('click', (e) => {
+    e.stopPropagation();
+    closePopup();
+  });
+
+  popOverlay.addEventListener('click', (e) => {
+    e.stopPropagation();
+  });
+
+  /* 第一幕 */
+  function playStage1() {
+    token++; current = 1; busy = false;
+    root.setAttribute('data-phase', '1');
+    curtain.style.display = '';
+    s2Layer.style.display = '';
+    s3Frame.style.display = 'none';
+    closePopup();
+
+    cancelAll(s2Els);
+    cancelAll(s3Els);
+
+    coins.getAnimations().forEach(a => a.cancel());
+    coins.style.opacity = '0';
+    coins.style.transform = 'translate(-50%,-50%) scale(.7)';
+    handL.getAnimations().forEach(a => a.cancel());
+    handR.getAnimations().forEach(a => a.cancel());
+
+    anim(heroImg, [
+      { opacity:0, filter:'blur(10px) brightness(.3)', transform:'scale(1.08)' },
+      { opacity:1, filter:'blur(8px) brightness(.5)',  transform:'scale(1.04)' }
+    ], { duration: 1200 });
+
+    anim(handL, [
+      { opacity:0, transform:'translateY(calc(-50% - 36px)) translateX(-110%)' },
+      { opacity:1, transform:'translateY(calc(-50% - 36px)) translateX(0)' }
+    ], { duration: 950, delay: 200, easing:'cubic-bezier(.16,1,.3,1)' });
+
+    anim(handR, [
+      { opacity:0, transform:'translateY(calc(-50% + 36px)) translateX(110%)' },
+      { opacity:1, transform:'translateY(calc(-50% + 36px)) translateX(0)' }
+    ], { duration: 950, delay: 420, easing:'cubic-bezier(.16,1,.3,1)' });
+
+    anim(hint, KF.up, { duration: 700, delay: 950 });
+  }
+
+  /* 第二幕 */
+  function playS2Content() {
+    anim(sealBox,    KF.down, { duration: 500, delay: 50 });
+    anim(nameGu,     KF.down, { duration: 560, delay: 120 });
+    anim(nameWang,   KF.down, { duration: 620, delay: 190 });
+    anim(leftSub,    KF.fade, { duration: 480, delay: 300 });
+
+    anim(creedRed,   KF.down, { duration: 560, delay: 260 });
+    anim(creedWhite, KF.down, { duration: 560, delay: 340 });
+    anim(tagsRow,    KF.up,   { duration: 500, delay: 480 });
+
+    anim(promptBar,  KF.fade, { duration: 580, delay: 620 });
+  }
+
+  async function goStage2() {
+    if (current !== 1 || busy) return;
+    const t = ++token; current = 2; busy = true;
+    root.setAttribute('data-phase', '2');
+    const DUR = 2400;
+
+    anim(hint, [{opacity:1},{opacity:0}], { duration:240, easing:'linear' });
+
+    anim(handL, [
+      { offset:0,    transform:'translateY(calc(-50% - 36px)) translateX(0)',      opacity:1, easing:'cubic-bezier(.3,.7,.2,1)' },
+      { offset:0.35, transform:'translateY(calc(-50% - 120px)) translateX(0)',     opacity:1, easing:'linear' },
+      { offset:0.48, transform:'translateY(calc(-50% - 120px)) translateX(0)',     opacity:1, easing:'cubic-bezier(.4,0,.6,1)' },
+      { offset:0.80, transform:'translateY(calc(-50% - 120px)) translateX(-150%)', opacity:0 },
+      { offset:1,    transform:'translateY(calc(-50% - 120px)) translateX(-150%)', opacity:0 }
+    ], { duration: DUR, fill:'both', easing:'linear' });
+
+    anim(handR, [
+      { offset:0,    transform:'translateY(calc(-50% + 36px)) translateX(0)',     opacity:1, easing:'cubic-bezier(.3,.7,.2,1)' },
+      { offset:0.35, transform:'translateY(calc(-50% + 70px)) translateX(0)',     opacity:1, easing:'linear' },
+      { offset:0.48, transform:'translateY(calc(-50% + 70px)) translateX(0)',     opacity:1, easing:'cubic-bezier(.4,0,.6,1)' },
+      { offset:0.82, transform:'translateY(calc(-50% + 70px)) translateX(150%)',   opacity:0 },
+      { offset:1,    transform:'translateY(calc(-50% + 70px)) translateX(150%)',   opacity:0 }
+    ], { duration: DUR, fill:'both', easing:'linear' });
+
+    anim(coins, [
+      { offset:0,    opacity:0, transform:'translate(-50%,-50%) scale(.7) translateX(0px)', easing:'cubic-bezier(.3,.7,.2,1)' },
+      { offset:0.35, opacity:1, transform:'translate(-50%,-50%) scale(1) translateX(0px)',  easing:'linear' },
+      { offset:0.48, opacity:1, transform:'translate(-50%,-50%) scale(1) translateX(0px)',  easing:'cubic-bezier(.3,.6,.4,1)' },
+      { offset:0.82, opacity:0, transform:'translate(-50%,-50%) scale(.85) translateX(280px)' },
+      { offset:1,    opacity:0, transform:'translate(-50%,-50%) scale(.85) translateX(280px)' }
+    ], { duration: DUR, fill:'both', easing:'linear' });
+
+    anim(heroImg, [
+      { offset:0,    filter:'blur(8px) brightness(.5)',   transform:'scale(1.04)', opacity:1, easing:'linear' },
+      { offset:0.52, filter:'blur(8px) brightness(.5)',   transform:'scale(1.04)', opacity:1, easing:EASE_FLOW },
+      { offset:1,    filter:'blur(0px) brightness(1.02)', transform:'scale(1)',    opacity:1 }
+    ], { duration: DUR, fill:'both', easing:'linear' });
+
+    await wait(Math.round(DUR * 0.62));
+    if (t !== token) return;
+    playS2Content();
+
+    await wait(Math.round(DUR * 0.38) + 100);
+    if (t !== token) return;
+    busy = false;
+  }
+
+  /* 第三幕舒缓动画：左右分别滑入，下方依次从底部升起 */
+  function playS3Content() {
+    let delay = 120;
+    const ROW_GAP = 280;
+
+    for (let i = 0; i < 3; i++) {
+      anim(wingL[i], KF.fromLeft,  { duration: 850, delay: delay });
+      anim(wingR[i], KF.fromRight, { duration: 850, delay: delay + 90 });
+      delay += ROW_GAP;
+    }
+
+    delay += 100;
+    const BODY_GAP = 320;
+    bodyItems.forEach(item => {
+      anim(item, KF.fromBottom, { duration: 920, delay: delay });
+      delay += BODY_GAP;
+    });
+  }
+
+  async function goStage3() {
+    if (current !== 2 || busy) return;
+    const t = ++token; current = 3; busy = true;
+
+    curtain.style.display = 'none';
+    cancelAll(s2Els);
+    s2Layer.style.display = 'none';
+
+    s3Frame.style.display = 'block';
+    root.setAttribute('data-phase', '3');
+
+    await wait(900);
+    if (t !== token) return;
+
+    playS3Content();
+
+    await wait(1800);
+    if (t !== token) return;
+    busy = false;
+  }
+
+  function replay() {
+    if (busy) return;
+    if (current === 1) playStage1();
+    else if (current === 2) { token++; playS2Content(); }
+    else if (current === 3) { token++; playS3Content(); }
+  }
+
+  function resetToStage1() {
+    token++; busy = false;
+    cancelAll(s3Els);
+    closePopup();
+    playStage1();
+  }
+
+  heroAnchor.addEventListener('click', () => {
+    if (busy) return;
+    if (current === 1) {
+      playSfx();      // ← 只在第一幕点这一下响
+      goStage2();
+    }
+    else if (current === 2) goStage3();
+    else if (current === 3) resetToStage1();
+  });
+
+  let started = false, wasInView = false;
+  const io = new IntersectionObserver(entries => {
+    const e = entries[0];
+    if (e.isIntersecting) {
+      if (!started) { started = true; playStage1(); }
+      else if (!wasInView) { replay(); }
+      wasInView = true;
+    } else { wasInView = false; }
+  }, { threshold: 0, rootMargin: '-10% 0px -10% 0px' });
+  io.observe(root);
+
+})();
+</script>
